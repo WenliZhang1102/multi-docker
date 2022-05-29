@@ -1,0 +1,26 @@
+language: generic
+sudo: required
+# 1. specify docker as a dependency
+services:
+  - docker
+# 2. build test version of React projects
+before_install:
+  - docker build -t wenlizhang/react-test -f ./client/Dockerfile.dev ./client
+# 3. run tests
+script:
+    - docker run -e CI=true wenlizhang/react-test npm run test
+# 4. build prod versions of all projects
+after_success:
+  - docker build -t wenlizhang/multi-client ./client
+  - docker build -t wenlizhang/multi-nginx ./nginx
+  - docker build -t wenlizhang/multi-server ./server
+  - docker build -t wenlizhang/multi-worker ./worker
+# docker login name and pssw? set it in Travis CI!
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # 5. push all to docker hub
+  - docker push wenlizhang/multi-client
+  - docker push wenlizhang/multi-nginx
+  - docker push wenlizhang/multi-server
+  - docker push wenlizhang/multi-worker
+
+# 6. tell Elastic Beanstalk to update
