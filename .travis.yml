@@ -1,5 +1,5 @@
-language: generic
 sudo: required
+language: generic
 # 1. specify docker as a dependency
 services:
   - docker
@@ -8,7 +8,7 @@ before_install:
   - docker build -t wenlizhang/react-test -f ./client/Dockerfile.dev ./client
 # 3. run tests
 script:
-    - docker run -e CI=true wenlizhang/react-test npm run test
+    - docker run -e CI=true wenlizhang/react-test npm test
 # 4. build prod versions of all projects
 after_success:
   - docker build -t wenlizhang/multi-client ./client
